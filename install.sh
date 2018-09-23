@@ -14,8 +14,9 @@ mkdir -p ~/src && cd ~/src
 git clone https://github.com/bitcoin/bitcoin.git
 cd bitcoin
 ./autogen.sh
-./configure --without-gui --without-upnp --disable-tests
+./configure --without-gui --without-upnp
 make
+make check
 make install
 
 echo "> Create Bitcoin User"
