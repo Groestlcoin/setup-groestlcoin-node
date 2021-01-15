@@ -2,31 +2,29 @@
 
 cd ~
 echo "> Updating Ubuntu"
-add-apt-repository -y ppa:bitcoin/bitcoin
-apt-get -y update
 apt-get -y install software-properties-common python-software-properties htop
 apt-get -y install git build-essential autoconf libboost-all-dev libssl-dev pkg-config
 apt-get -y install libprotobuf-dev protobuf-compiler libqt4-dev libqrencode-dev libtool
-apt-get -y install libcurl4-openssl-dev db4.8 libevent-dev
+apt-get -y install libcurl4-openssl-dev libdb5.3 libdb5.3-dev libdb5.3++-dev libevent-dev
 
-echo "> Build bitcoin from source"
-mkdir -p /mnt/hdd/bitcoin-src && cd /mnt/hdd/bitcoin-src
-git clone https://github.com/bitcoin/bitcoin.git
-cd bitcoin
+echo "> Build groestlcoin from source"
+mkdir -p /mnt/hdd/groestlcoin-src && cd /mnt/hdd/groestlcoin-src
+git clone https://github.com/groestlcoin/groestlcoin.git
+cd groestlcoin
 ./autogen.sh
 ./configure --without-gui --without-upnp
 make
 make check
 make install
 
-echo "> Create Bitcoin User"
-useradd -m bitcoin
+echo "> Create Groestlcoin User"
+useradd -m groestlcoin
 
-echo "> Bitcoin config"
-cd ~bitcoin
-sudo -u bitcoin mkdir .bitcoin
-config=".bitcoin/bitcoin.conf"
-sudo -u bitcoin touch $config
+echo "> Groestlcoin config"
+cd ~groestlcoin
+sudo -u groestlcoin mkdir .groestlcoin
+config=".groestlcoin/groestlcoin.conf"
+sudo -u groestlcoin touch $config
 echo "server=1" > $config
 echo "daemon=1" >> $config
 echo "connections=40" >> $config
@@ -35,20 +33,15 @@ echo "txindex=1" >> $config
 echo "externalip=87.197.157.72" >> $config
 echo "zmqpubrawblock=tcp://127.0.0.1:28332" >> $config
 echo "zmqpubrawtx=tcp://127.0.0.1:28333" >> $config
-echo "datadir=/mnt/hdd/btc-data" >> $config
-echo "port=8301" >> $config
-echo "prune=1" >> $config
+echo "datadir=/mnt/hdd/grs-data" >> $config
 randUser=`< /dev/urandom tr -dc A-Za-z0-9 | head -c30`
 randPass=`< /dev/urandom tr -dc A-Za-z0-9 | head -c30`
 echo "rpcuser=$randUser" >> $config
 echo "rpcpassword=$randPass" >> $config
 
-echo "> Setup Bitcoin node to start at server startup"
-sudo -u bitcoin mkdir /mnt/hdd/btc-data
+echo "> Setup Groestlcoin node to start at server startup"
+sudo -u groestlcoin mkdir /mnt/hdd/grs-data
 sed -i '2a\
-sudo -u bitcoin bitcoind -datadir=/mnt/hdd/btc-data' /etc/rc.local
-
-echo "> Add an 'btc' alias ('btc getbalance')"
-echo "alias btc=\"sudo -u bitcoin bitcoin-cli -datadir=/mnt/hdd/btc-data\"" >> ~/.bashrc
+sudo -u groestlcoin groestlcoind -datadir=/mnt/hdd/grs-data' /etc/rc.local
 
 reboot
